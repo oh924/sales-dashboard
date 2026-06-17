@@ -18,7 +18,7 @@ export default auth((req) => {
     if (!isAdmin) return NextResponse.redirect(new URL("/dashboard", nextUrl));
   }
 
-  if (nextUrl.pathname === "/dashboard") {
+  if (nextUrl.pathname.startsWith("/dashboard")) {
     if (!isLoggedIn) return NextResponse.redirect(new URL("/login", nextUrl));
   }
 
