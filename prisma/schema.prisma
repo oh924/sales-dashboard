@@ -1,0 +1,80 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id           String   @id @default(cuid())
+  name         String
+  email        String   @unique
+  passwordHash String
+  role         String   @default("USER")
+  salesRepName String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  uploadedReports SalesReport[]
+}
+
+model SalesReport {
+  id           String   @id @default(cuid())
+  year         Int
+  month        Int
+  title        String
+  fileName     String
+  uploadedById String
+  uploadedAt   DateTime @default(now())
+  isActive     Boolean  @default(true)
+
+  uploadedBy User        @relation(fields: [uploadedById], references: [id])
+  salesData  SalesData[]
+
+  @@unique([year, month])
+}
+
+model SalesData {
+  id           String @id @default(cuid())
+  reportId     String
+  salesRepName String
+  rowOrder     Int
+
+  w1Orders  Float?
+  w1Profit  Float?
+  w1Rate    Float?
+  w2Orders  Float?
+  w2Profit  Float?
+  w2Rate    Float?
+  w3Orders  Float?
+  w3Profit  Float?
+  w3Rate    Float?
+  w4Orders  Float?
+  w4Profit  Float?
+  w4Rate    Float?
+  w5Orders  Float?
+  w5Profit  Float?
+  w5Rate    Float?
+
+  monthlyOrders Float?
+  monthlyProfit Float?
+  monthlyRate   Float?
+
+  cumulativeOrders Float?
+  cumulativeProfit Float?
+  expenses         Float?
+  netProfit        Float?
+
+  h1CumulativeProfit Float?
+  h1Target           Float?
+  h2CumulativeProfit Float?
+  h2Target           Float?
+
+  report SalesReport @relation(fields: [reportId], references: [id], onDelete: Cascade)
+
+  @@unique([reportId, salesRepName])
+}
